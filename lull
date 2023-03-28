@@ -341,7 +341,7 @@ local Buttons = {
         Name = "Try change team",
         Callback = function()
             bring(states.PLAYER_SELECTED, GetRO(), true)
-            Notify("Brought "..dname(states.PLAYER_SELECTED))
+            Notify("Tried to change team of "..dname(states.PLAYER_SELECTED))
         end    
     }),
     Tab:AddButton({
@@ -355,14 +355,21 @@ local Buttons = {
         Name = "Kill",
         Callback = function()
             kill({states.PLAYER_SELECTED})
-            Notify("Brought "..dname(states.PLAYER_SELECTED))
+            Notify("Killing "..dname(states.PLAYER_SELECTED))
         end    
     }),
     Tab:AddButton({
         Name = "Bring",
         Callback = function()
             bring(states.PLAYER_SELECTED, GetRO())
-            Notify("Killing "..dname(states.PLAYER_SELECTED))
+            Notify("Brought "..dname(states.PLAYER_SELECTED))
+        end    
+    }),
+    Tab:AddButton({
+        Name = "Goto/To",
+        Callback = function()
+            getRoot().CFrame = states.PLAYER_SELECTED.Character:FindFirstChildOfClass("Part").CFrame
+            Notify("Teleported to "..dname(states.PLAYER_SELECTED))
         end    
     }),
     Tab:AddButton({
