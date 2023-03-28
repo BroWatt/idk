@@ -1,0 +1,796 @@
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+
+local Window = OrionLib:MakeWindow({Name = "Jenri Jaks for bublox omgg", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest"})
+local allparts = {}
+local Tab = Window:MakeTab({
+	Name = "Abuse",
+	Icon = "rbxassetid://12820042051",
+	PremiumOnly = false
+})
+
+local Plr = Window:MakeTab({
+	Name = "Player",
+	Icon = "rbxassetid://11176073563",
+	PremiumOnly = false
+})
+
+local Server = Window:MakeTab({
+	Name = "Server",
+	Icon = "rbxassetid://11920994509",
+	PremiumOnly = false
+})
+
+
+function Notify(Text)
+    OrionLib:MakeNotification({
+        Name = "Notification",
+        Content = Text,
+        Image = "rbxassetid://4483345998",
+        Time = 5
+    })
+end
+local states = {}
+states.TABLE_PLAYERS = {}
+
+function dname(plr, ds)
+	local displayname = plr.DisplayName.." "
+	if plr.Name == plr.DisplayName then
+		displayname = ""
+	end
+
+	local displaymsg = displayname.."@"..plr.Name
+	local dis1 = ""
+	local dis2
+	local co = gcfp(plr)
+	if pr ~= nil then
+		dis1 = pr
+	else
+		dis1 = co
+	end
+	if ds == true then
+		dis2 = ""
+	else
+		dis2 = " ["..dis1.."]"
+	end
+	
+	displaymsg = displaymsg..dis2
+	return tostring(displaymsg)
+end
+
+local PlrLogs = Window:MakeTab({
+	Name = "Player logs",
+	Icon = "rbxassetid://9704079911",
+	PremiumOnly = false
+})
+function createTab()
+	plrs = game.Players:GetPlayers()
+	for i = 1, #plrs do
+		local plr = plrs[i]
+		table.insert(states.TABLE_PLAYERS, {PlayerName = plr.Name, PlayerUserId = plr.UserId, PlayerNumber = i, PlayerData = plr})
+        local displayname = plr.DisplayName.." "
+        if plr.Name == plr.DisplayName then
+            displayname = ""
+        end
+    
+        local displaymsg = displayname.."@"..plr.Name
+        PlrLogs:AddLabel("[#"..i.."]: "..displaymsg)
+    end
+end
+function checkifs(plr,list)
+    local s = false
+    for _,v in pairs(list) do
+        if plr.UserId == v then
+            s = true
+        end
+    end
+    return s
+end
+function newcode(plr)
+	local find = false
+	local number = #states.TABLE_PLAYERS
+	for _,v in pairs(states.TABLE_PLAYERS) do
+		if v.PlayerUserId == plr.UserId then
+			find = true
+		end
+	end
+
+	if find == false then
+		table.insert(states.TABLE_PLAYERS, {PlayerName = plr.Name, PlayerUserId = plr.UserId, PlayerNumber = (number+1), PlayerData = plr})
+	end
+end
+function gcfp(plr)
+	for _,v in pairs(states.TABLE_PLAYERS) do
+		if v.PlayerUserId == plr.UserId then
+			return v.PlayerNumber
+		end
+	end
+
+	return nil
+end
+
+function gpfc(code)
+	for _,v in pairs(states.TABLE_PLAYERS) do
+		if v.PlayerNumber == code then
+			return v.PlayerData
+		end
+	end
+
+	return nil
+end
+local lp = game.Players.LocalPlayer
+createTab()
+states.LAST_PLAYER = nil
+function getcurrentplayer(plr)
+	local player = plr
+	for _,v in pairs(game.Players:GetPlayers()) do
+		if v.UserId == plr.UserId then
+			player = v
+		end
+	end
+	return player
+end
+function gpfu(userid)
+	for _,v in pairs(game.Players:GetPlayers()) do
+		if v.UserId == userid then
+			return v
+		end
+	end
+end
+function gpfs(nameString)
+	if not nameString then return end 
+	if string.sub(nameString, 0,2) == ".t" then
+		if tonumber(string.sub(nameString, 3, #nameString)) then
+			for _,v in pairs(states.TABLE_PLAYERS) do
+				if v.PlayerNumber == tonumber(string.sub(nameString, 3, #nameString)) then
+					states.LAST_PLAYER = v.PlayerData
+					return getcurrentplayer(v.PlayerData)
+				end
+			end
+		end
+	end
+	if nameString == ".me" then
+		return game.Players.LocalPlayer
+	end
+	if nameString == ".last" or nameString == ".l" then
+		return getcurrentplayer(states.LAST_PLAYER)
+	end
+	if nameString == ".random" or nameString == ".r" then
+		local players = game.Players:GetPlayers()
+		local list = {}
+		for _,plr in pairs(players) do
+			if plr ~= game.Players.LocalPlayer then
+				table.insert(list, plr)
+			end
+		end
+		local random = list[math.random(1,#list)]
+		states.LAST_PLAYER = random
+		return getcurrentplayer(random)
+	end
+	
+	if string.sub(nameString, 0,1) == "[" and string.sub(nameString, (#nameString),#nameString) == "]" then
+		local newstring = (string.sub(nameString, 2,(#nameString-1)))
+		local found = false
+		for _,player in pairs(game.Players:GetPlayers()) do
+			if string.lower(player.Name) == string.lower(newstring) then
+				found = true 
+				states.LAST_PLAYER = player
+				return getcurrentplayer(player)
+			end
+		end
+
+		if found == false then
+			return nil
+		end
+	else
+		local matches= {}
+	for _, player in ipairs (game.Players:GetPlayers()) do
+		if player ~= game.Players.LocalPlayer then
+			if string.lower(player.Name):match(string.lower(nameString)) then
+				table.insert(matches, player)
+			end
+		end
+	end
+	if #matches== 1 then
+		states.LAST_PLAYER = matches[1]
+		return matches[1]
+	else
+		return nil
+	end
+	end
+end
+function addplayer(plr, list)
+    if not plr then Notify("Player not found") return end
+    local player = plr
+    if plr == game.Players.LocalPlayer then return end
+    if player and not table.find(list, player.UserId) then 
+        table.insert(list, player.UserId)
+    end 
+end
+
+function removeplayer(plr, list)
+    if not plr then Notify("Player not found") return end
+    local player = plr
+    if plr == game.Players.LocalPlayer then return end
+    if player then 
+        local tf = table.find(list, player.UserId)
+        if tf then
+            table.remove(list, tf)
+        end
+    end 
+end
+
+
+
+function ChatNotify(text, color)
+	Services.SG:SetCore("ChatMakeSystemMessage", {Text = text; Color = color; Font = Enum.Font.SourceSansBold; FontSize = Enum.FontSize.Size42})
+end
+states.PLAYER_NOTIFICATIONS = true
+game.Players.PlayerAdded:connect(function(plr)
+	local code = gcfp(plr)
+	local newcoded = false
+	if code == nil then
+		newcode(plr)
+		newcoded = true
+        local displayname = plr.DisplayName.." "
+        if plr.Name == plr.DisplayName then
+            displayname = ""
+        end
+    
+        local displaymsg = displayname.."@"..plr.Name
+        PlrLogs:AddLabel("[#"..gcfp(plr).."]: "..displaymsg)
+	end
+	local displayname = plr.DisplayName.." "
+	if plr.Name == plr.DisplayName then
+		displayname = ""
+	end
+
+	local displaymsg = displayname.."@"..plr.Name
+
+	if states.PLAYER_NOTIFICATIONS == true then
+		if plr.AccountAge < 80 then
+            ChatNotify("[#"..gcfp(plr).."] "..displaymsg.." joined: "..plr.AccountAge..".", colors.Yellow, "none")
+        else
+            if newcoded == true then
+                ChatNotify("[#"..gcfp(plr).."] "..displaymsg.." joined.", colors.Green, "none")
+            end
+            if newcoded == false then
+                ChatNotify("[#"..gcfp(plr).."] "..displaymsg.." re-joined.", Color3.fromRGB(167, 252, 188), "none")
+            end
+        end	
+	end
+end)
+
+states.PLAYER_SELECTED = nil
+
+Tab:AddTextbox({
+	Name = "Player selected",
+	Default = "",
+	TextDisappear = false,
+	Callback = function(Value)
+        if value == "nil" then
+            states.PLAYER_SELECTED = nil
+        else
+            states.PLAYER_SELECTED = gpfs(Value)
+        end
+	end	  
+})
+
+local NamePlayer = Tab:AddLabel("Not player selected")
+local Tabs = {
+    LK = {}
+}
+function addLoop(times, funct)
+    task.spawn(function ()
+        while wait(times) do
+            pcall(funct)
+        end
+    end)
+end
+
+addLoop(0, function()
+    if states.PLAYER_SELECTED == nil then
+        NamePlayer:Set("Not player selected")
+    else
+        NamePlayer:Set("Player selected: "..dname(states.PLAYER_SELECTED))
+    end
+end)
+function gettool(name)
+    return lp.Backpack:FindFirstChild(name) or character():FindFirstChild(name)
+end
+function kill(plrs)
+    local events = {}
+    for _,plr in pairs(plrs) do
+        local success, errors = pcall(function()
+            if plr and plr.Character and plr.TeamColor.Name ~= lp.TeamColor.Name then
+               
+                local hum = plr.Character:FindFirstChild("Humanoid")
+                if hum then
+                    table.insert(events,{hum, 500, {0,CFrame.new(0,0,0)}})
+                    
+                end
+            end
+        end)
+    end
+    if events[1] then
+        local gun = gettool("Pistol")
+        local remote = gun:WaitForChild("RemoteEvent")
+        for _,event in pairs(events) do
+            task.spawn(function()
+                remote:FireServer(unpack(event))
+            end)
+           
+        end
+    end
+   
+end
+local loopbringpos = CFrame.new(0,0,0)
+--l__RemoteEvent__9:FireServer(v33, v34, { l__Magnitude__38, v39 });
+addLoop(0, function()
+    local lks = {}
+    for _,plr in pairs(game.Players:GetPlayers()) do
+        if checkifs(plr,Tabs.LK) then 
+            table.insert(lks, plr)
+        end
+    end
+    kill(lks, true)
+end)
+
+local Event = game.ReplicatedStorage:WaitForChild("Event");
+local Buttons = {
+    Tab:AddButton({
+        Name = "Try change team",
+        Callback = function()
+            bring(states.PLAYER_SELECTED, GetRO(), true)
+            Notify("Brought "..dname(states.PLAYER_SELECTED))
+        end    
+    }),
+    Tab:AddButton({
+        Name = "Kill all",
+        Callback = function()
+            kill(game.Players:GetPlayers())
+            Notify("Killing all")
+        end    
+    }),
+    Tab:AddButton({
+        Name = "Kill",
+        Callback = function()
+            kill({states.PLAYER_SELECTED})
+            Notify("Brought "..dname(states.PLAYER_SELECTED))
+        end    
+    }),
+    Tab:AddButton({
+        Name = "Bring",
+        Callback = function()
+            bring(states.PLAYER_SELECTED, GetRO())
+            Notify("Killing "..dname(states.PLAYER_SELECTED))
+        end    
+    }),
+    Tab:AddButton({
+        Name = "Loopkill",
+        Callback = function()
+            addplayer(states.PLAYER_SELECTED, Tabs.LK)
+            Notify("You are lking "..dname(states.PLAYER_SELECTED))
+        end    
+    }),
+    Tab:AddButton({
+        Name = "Unloopkill",
+        Callback = function()
+            removeplayer(states.PLAYER_SELECTED, Tabs.LK)
+            Notify("You are not lking "..dname(states.PLAYER_SELECTED))
+        end    
+    }),
+    Tab:AddButton({
+        Name = "Loopbring",
+        Callback = function()
+            loopbringpos = GetRO()
+            states.LOOP_BRING = states.PLAYER_SELECTED
+            Notify("You are loopbringing "..dname(states.PLAYER_SELECTED))
+        end    
+    }),
+    Tab:AddButton({
+        Name = "Unloopbring",
+        Callback = function()
+            states.LOOP_BRING = nil
+            Notify("Loopbring disabled"..dname(states.PLAYER_SELECTED))
+        end    
+    }),
+    -- Tab:AddButton({
+    --     Name = "Ban",
+    --     Callback = function()
+    --         Event:FireServer("BanHacker", { states.PLAYER_SELECTED })
+    --     end    
+    -- })
+}
+function getRoot()
+	local char = character()
+	return char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso")
+end
+function character()
+	return game.Players.LocalPlayer.Character
+end
+
+function backpack()
+	return game.Players.LocalPlayer.Backpack
+end
+function campos()
+	return game.Workspace.CurrentCamera.CFrame
+end
+function GetRO()
+	local part = getRoot()
+	local a1,a2,a3
+	a1,a2,a3 = part.CFrame:ToOrientation()
+	return CFrame.new(part.CFrame.X, part.CFrame.Y, part.CFrame.Z) * CFrame.fromOrientation(0,a2,0)
+end
+local RefreshGun = nil
+function refresh()
+    local pos = GetRO()
+    local cam = campos()
+    task.spawn(function ()
+        lp.CharacterAdded:Wait()
+        character():WaitForChild("Humanoid")
+        getRoot().CFrame = pos
+        game.Workspace.CurrentCamera.CFrame = cam
+        wait()
+        game.Workspace.CurrentCamera.CFrame = cam
+        lp.PlayerGui.StaticScreenGui.WeaponFrame.Visible = false
+        lp.PlayerGui.StaticScreenGui.BanHacker.Visible = false
+        lp.PlayerGui.StaticScreenGui.SpawnButton.Visible = false
+    end)
+    Event:FireServer("Spawn", {RefreshGun, true})
+    
+end
+
+
+Plr:AddToggle({
+	Name = "Remove Textures",
+	Default = false,
+	Callback = function(Value)
+		if Value == true then
+            for _,tab in pairs(allparts) do
+                pcall(function()
+                    tab.Part.Material = Enum.Material.Plastic
+                end)
+                
+            end
+        else
+            for _,tab in pairs(allparts) do
+                pcall(function()
+                    tab.Part.Material = tab.Material
+                end)
+                
+            end
+        end
+	end    
+})
+Plr:AddButton({
+    Name = "Coords",
+    Callback = function()
+        local plr = lp
+        local weon = plr.Character.Torso.CFrame.X
+        local ponte = plr.Character.Torso.CFrame.Y
+        local viooo = plr.Character.Torso.CFrame.Z
+
+        weon = math.floor(weon)
+        ponte = math.floor(ponte)
+        viooo = math.floor(viooo)
+
+        Notify("COORDS: "..weon..", "..ponte..", "..viooo)
+        if (setclipboard) then
+            setclipboard(weon..",".. ponte..",".. viooo)
+        end
+    end    
+})
+
+Plr:AddButton({
+    Name = "Refresh",
+    Callback = function()
+        refresh()
+    end    
+})
+Plr:AddButton({
+    Name = "Rejoin",
+    Callback = function()
+        game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId, game.JobId, game.Players.LocalPlayer)
+    end    
+})
+Plr:AddButton({
+    Name = "ChangeTeam",
+    Callback = function()
+        firetouchinterest(lp.Character.PrimaryPart, game:GetService("Workspace").LobbyRoom.ChangeTeamPad, 0)
+        refresh()
+    end    
+})
+local infra = workspace:WaitForChild("Infrastructures")
+local gf = infra:WaitForChild("GermanFlag"):WaitForChild("Pad")
+local bf = infra:WaitForChild("BritishFlag"):WaitForChild("Pad")
+
+function god(char, ss)
+	states.NOT_HUM = true
+	pcall(function()
+		if not char then
+			char = game.Players.LocalPlayer.Character
+		end
+		local hum = char:FindFirstChild("Humanoid")
+		
+		local hum2 = hum:Clone()
+		
+		hum:Destroy()
+		hum2.Parent = char
+		game.Workspace.CurrentCamera.CameraSubject = char
+	end)
+	
+	coroutine.wrap(function()
+		game.Players.LocalPlayer.CharacterAdded:Wait()
+		states.NOT_HUM = true
+	end)()
+	
+end
+function get(args)
+
+    local plr = args.plr
+    local pos = args.pos
+    local LoopBring = args.lb
+    local trykill = args.trykill
+    local oldpos = GetRO()
+    
+    if not gettool("Pistol") then
+        refresh()
+        repeat task.wait() until gettool("Pistol")
+    end
+   
+    local tool = gettool("Pistol")
+    if tool then
+        local hrp = getRoot()
+        local char = character()
+        hrp.CFrame = pos
+        god(char)
+        tool.Parent = char
+        local stop = 0
+        repeat task.wait()
+            stop = stop+1
+            hrp.CFrame = pos
+            local success, errormsg = pcall(function()
+                firetouchinterest(tool.Handle, plr.Character.PrimaryPart, 1)
+                firetouchinterest(tool.Handle, plr.Character.PrimaryPart, 0)
+                if crim == true then
+                    firetouchinterest(spawnlocations[1], plr.Character.PrimaryPart, 0)
+                    firetouchinterest(spawnlocations[1], plr.Character.PrimaryPart, 1)
+                end
+                if trykill == true then
+                    for _,v in pairs(states.DAMAGE_PARTS) do
+                        firetouchinterest(v, plr.Character.Torso, 0)
+                    end
+                end
+            end)
+        until (tool.Parent ~= char or char.Parent ~= workspace or stop > 500) and stop > 3
+        getRoot().CFrame = pos
+        if LoopBring == true then
+            tool:Destroy()
+        end
+    end
+end
+
+function bring(Player, pos, ck)
+    local oldpos = GetRO()
+    local tb = {plr = Player, pos = pos}
+    if ck == true then
+        tb.trykill = game:GetService("Workspace").LobbyRoom.ChangeTeamPad
+    end
+    local g = get(tb)
+    wait(0.1)
+    refresh()
+    getRoot().CFrame = oldpos
+        
+    if noti == true and g ~= "Failed" then
+        Notify("Brought "..dname(Player), colors.Green)
+    end       
+end
+
+local ax = {
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+}
+local al = {
+    "E",
+    "D",
+    "C",
+    "B",
+    "A"
+}
+Plr:AddButton({
+    Name = "Win",
+    Callback = function()
+        states.loopkillall = true
+        if lp.Team.Name == "Axis" then
+            for _,v in pairs(ax) do
+                local points = game:GetService("Workspace").Terrain.TrenchesPoint
+                repeat task.wait()
+                    getRoot().CFrame = points[v].CFrame
+                until points[v].Team.Value == lp.Team.Name
+            end
+        elseif lp.Team.Name == "Allies" then
+            for _,v in pairs(al) do
+                local points = game:GetService("Workspace").Terrain.TrenchesPoint
+                repeat task.wait()
+                    getRoot().CFrame = points[v].CFrame
+                until points[v].Team.Value == lp.Team.Name
+            end
+        end
+        states.loopkillall = false
+        if lp.Team.Name == "Axis" then
+            firetouchinterest(lp.Character.PrimaryPart, bf, 0)
+        end
+        if lp.Team.Name == "Allies" then
+            firetouchinterest(lp.Character.PrimaryPart, gf, 0)
+        end
+        
+    end    
+})
+
+
+
+addLoop(0.5, function()
+    if states.loopkillall == true then
+        kill(game.Players:GetPlayers())
+    end
+end)
+Plr:AddSection({
+	Name = "Guns"
+})
+
+local GunsSelection = {
+    "Sniper",
+    "Mortar",
+    "Machine Gun",
+    "Rifle",
+    "Thompson",
+    "Random"
+}
+Plr:AddDropdown({
+	Name = "Select gun",
+	Default = "Random",
+	Options = GunsSelection,
+	Callback = function(val)
+		if val == "Random" then
+            RefreshGun = nil
+        else
+            RefreshGun = val
+        end
+        refresh()
+	end    
+})
+Plr:AddSection({
+	Name = "Cursor"
+})
+states.CURSOR = nil
+
+addLoop(0, function()
+    lp:GetMouse().Icon = "rbxassetid://"..states.CURSOR
+    lp:GetMouse().Icon = "http://www.roblox.com/asset?id="..states.CURSOR
+end)
+Plr:AddTextbox({
+	Name = "Cursor",
+	Default = "",
+	TextDisappear = true,
+	Callback = function(Value)
+        Value = string.lower(Value)
+		if Value == "off" then
+            states.CURSOR = nil
+        elseif Value == "pl" then
+            states.CURSOR = 426730675
+        elseif Value == "dot" then
+            states.CURSOR = 973818318
+        elseif tonumber(Value) then
+            states.CURSOR = Value
+        end
+        Notify("Cursor set to: "..Value)
+	end	  
+})
+
+Plr:AddSection({
+	Name = "Teleports"
+})
+Plr:AddButton({
+    Name = "Allies Flag",
+    Callback = function()
+        getRoot().CFrame = CFrame.new(-2,103,766)
+    end    
+})
+Plr:AddButton({
+    Name = "Point E",
+    Callback = function()
+        getRoot().CFrame = CFrame.new(82,92,500)
+    end    
+})
+Plr:AddButton({
+    Name = "Point D",
+    Callback = function()
+        getRoot().CFrame = CFrame.new(-28,92,249)
+    end    
+})
+Plr:AddButton({
+    Name = "Point C",
+    Callback = function()
+        getRoot().CFrame = CFrame.new(-49,92,-1)
+    end    
+})
+Plr:AddButton({
+    Name = "Point B",
+    Callback = function()
+        getRoot().CFrame = CFrame.new(-139,92,-252)
+    end    
+})
+Plr:AddButton({
+    Name = "Point A",
+    Callback = function()
+        getRoot().CFrame = CFrame.new(-152,92,-502)
+    end    
+})
+Plr:AddButton({
+    Name = "Axis Flag",
+    Callback = function()
+        getRoot().CFrame = CFrame.new(-2,103,-766)
+    end    
+})
+
+
+addLoop(0.3, function()
+    if states.LOOP_BRING ~= nil then
+        local tab = {plr = states.LOOP_BRING, pos = loopbringpos, lb = true}
+        get(tab)
+        refresh()
+    end
+end)
+
+Server:AddToggle({
+	Name = "Anti-Misil [BETA]",
+	Default = false,
+	Callback = function(Value)
+		states.ANTI_MISIL = Value
+	end    
+})
+
+
+-- Server:AddButton({
+-- 	Name = "Crash",
+-- 	Callback = function(Value)
+--         local gun = gettool("Pistol")
+--         local remote = gun:WaitForChild("RemoteEvent")
+--         if gun then
+--             local event = {lp.Character.PrimaryPart.Position, 500, {0,CFrame.new(0,0,0)}}
+--             for i = 1,100000 do
+--                 task.spawn(function()
+--                     remote:FireServer(unpack(event))
+--                 end)
+               
+--             end
+--         end
+       
+-- 	end    
+-- })
+
+
+game:GetService("RunService").Heartbeat:Connect(function()
+    if states.ANTI_MISIL == true then
+        for _,v in pairs(game.Workspace:GetChildren()) do
+            if v.Name == "Missile" then
+                firetouchinterest(v, lp.Character.PrimaryPart, 0)
+                firetouchinterest(v, lp.Character.PrimaryPart, 1)
+            end
+        end
+    end
+end)
+for _, v in pairs(game:GetDescendants()) do
+    pcall(function()
+        table.insert(allparts, {
+            Part = v, 
+            Material = v.Material}
+        )
+    end)
+end
+
+OrionLib:Init()
+
